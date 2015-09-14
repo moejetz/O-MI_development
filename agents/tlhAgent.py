@@ -1,13 +1,16 @@
 #!/bin/env python3
+# -*- coding: utf-8 -*-
 
 '''
 This is an external agent for O-MI (https://github.com/AaltoAsia/O-MI).
 It is based on https://github.com/AaltoAsia/O-MI/blob/master/agentExample.py
-Currently implemented sensors are temperature and light.
+Currently implemented sensors are temperature, light and humidity.
 
 The agent is part of a project from Kary Främling.
 The goal is to create a test implementation of O-MI for one room at the Aalto University,
 to act as a reference implementation and base for further projects concerning room automation for the whole University.
+
+Note: only works with python3.
 
 Written by Moritz Kraus, 2015
 '''
@@ -45,12 +48,14 @@ try:
 
         #get current values
         temperature = io.open('/mnt/1wire/26.595D45010000/temperature', 'r').read().strip()
-        light = io.open('/mnt/1wire/26.595D45010000/VAD', 'r').read().strip()
+        light 		= io.open('/mnt/1wire/26.595D45010000/VAD', 'r')		.read().strip()
+        humidity 	= io.open('/mnt/1wire/26.DD4DCB010000/humidity', 'r')	.read().strip()
 
         #verbose output
         if(verbose):
             print ('Temperature:\t\t', temperature)
             print ('Light:\t\t\t', light)
+            print ('Humidity:\t\t', humidity)
             print ('=================================')
 
         odf_message = b'''
@@ -65,6 +70,11 @@ try:
                     <InfoItem name="light">
                         <value>''' +\
                         	bytes(light, "utf-8") +\
+                        b'''</value>
+                    </InfoItem>
+                    <InfoItem name="humidity">
+                        <value>''' +\
+                            bytes(humidity, "utf-8") +\
                         b'''</value>
                     </InfoItem>
                 </Object>
