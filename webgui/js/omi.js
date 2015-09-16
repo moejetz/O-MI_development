@@ -1,17 +1,20 @@
 url = "http://130.233.193.113:8080/";
 dataType = "application/xml";
 xml = 
-      '<?xml version="1.0"?>' +
-        '<omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="-1">' +
-          '<read xmlns="omi.xsd">' +
-            '<requestID>6</requestID>' +
-          '</read>' +
-        '</omi:omiEnvelope>';
+  '<?xml version="1.0"?>'+
+  '<omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="0">'+
+    '<omi:read msgformat="odf">'+
+      '<msg xmlns="omi.xsd">'+
+        '<Objects xmlns="odf.xsd">'+
+          '<Object>'+
+            '<id>CS Building - B126</id>'+
+          '</Object>'+
+        '</Objects>'+
+      '</msg>'+
+    '</omi:read>'+
+  '</omi:omiEnvelope>'
 
-var tempData=[];
-var lightData=[];
-var humidityData=[];
-var labels = [];
+
 var latestTempData = [0];
 var latestLightData = [0];
 var latestHumidityData = [0];
@@ -26,13 +29,11 @@ jQuery(document).ready(function($) {
     //load latest sensor data
     getLatestData();
 
-    setTimeout(function() {
-
-      $('#loading').remove();      
+    setTimeout(function() {   
       initializeTemp();
       initializeLight();
       initializeHumidity();
-    }, 1000);  
+    }, 1);  
 
 });
 
@@ -51,11 +52,9 @@ function initializeTemp() {
             plotBorderWidth: 0,
             plotShadow: false
         },
-
         title: {
             text: 'Temperature'
         },
-
         pane: {
             startAngle: -150,
             endAngle: 150,
@@ -130,7 +129,6 @@ function initializeTemp() {
                 color: '#DF5353' // red
             }]
         },
-
         series: [{
             name: 'Temperature',
             data: latestTempData,
@@ -138,26 +136,20 @@ function initializeTemp() {
                 valueSuffix: ' °C'
             }
         }]
-
     },
-        // Add some life
-        function (chart) {
-            if (!chart.renderer.forExport) {
-                setInterval(function () {
-                    var point = chart.series[0].points[0],
-                        newVal,
-                        inc = Math.round((Math.random() - 0.5) * 20);
+    // Add some life
+    function (chart) {
+        if (!chart.renderer.forExport) {
+            setInterval(function () {
+                var point = chart.series[0].points[0],
+                    newVal,
+                    inc = Math.round((Math.random() - 0.5) * 20);
 
-                    newVal = point.y + inc;
-                    if (newVal < 0 || newVal > 200) {
-                        newVal = point.y - inc;
-                    }
+                point.update(latestTempData);
 
-                    point.update(latestTempData);
-
-                }, 3000);
-            }
-        });
+            }, 3000);
+        }
+    });
 }
 
 
@@ -172,11 +164,9 @@ function initializeLight() {
             plotBorderWidth: 0,
             plotShadow: false
         },
-
         title: {
             text: 'Light'
         },
-
         pane: {
             startAngle: -150,
             endAngle: 150,
@@ -261,19 +251,19 @@ function initializeLight() {
         }]
 
     },
-        // Add some life
-        function (chart) {
-            if (!chart.renderer.forExport) {
-                setInterval(function () {
-                    var point = chart.series[0].points[0],
-                        newVal,
-                        inc = Math.round((Math.random() - 0.5) * 20);
+    // Add some life
+    function (chart) {
+        if (!chart.renderer.forExport) {
+            setInterval(function () {
+                var point = chart.series[0].points[0],
+                    newVal,
+                    inc = Math.round((Math.random() - 0.5) * 20);
 
-                    point.update(latestLightData);
+                point.update(latestLightData);
 
-                }, 3000);
-            }
-        });
+            }, 3000);
+        }
+    });
 }
 
 
@@ -291,11 +281,9 @@ function initializeHumidity() {
             plotBorderWidth: 0,
             plotShadow: false
         },
-
         title: {
             text: 'Humidity'
         },
-
         pane: {
             startAngle: -150,
             endAngle: 150,
@@ -384,24 +372,19 @@ function initializeHumidity() {
         }]
 
     },
-        // Add some life
-        function (chart) {
-            if (!chart.renderer.forExport) {
-                setInterval(function () {
-                    var point = chart.series[0].points[0],
-                        newVal,
-                        inc = Math.round((Math.random() - 0.5) * 20);
+    // Add some life
+    function (chart) {
+        if (!chart.renderer.forExport) {
+            setInterval(function () {
+                var point = chart.series[0].points[0],
+                    newVal,
+                    inc = Math.round((Math.random() - 0.5) * 20);
 
-                    newVal = point.y + inc;
-                    if (newVal < 0 || newVal > 200) {
-                        newVal = point.y - inc;
-                    }
+                point.update(latestHumidityData);
 
-                    point.update(latestHumidityData);
-
-                }, 3000);
-            }
-        });
+            }, 3000);
+        }
+    });
 }
 
 
@@ -431,48 +414,24 @@ function getLatestData() {
           console.error('dataset incomplete. Ignoring...');
           recall();
           return;
-        } 
-
+        }
 
         $(data).find("InfoItem").each(function() {
 
           if($(this).attr('name')=='temperature') {
-            $(this).find('value').each(function() {
-              tempData.push(parseFloat($(this).text()));
-              labels.push(formatUnixTime($(this).attr('unixTime')));
-
-            });
+            latestTempData = [(parseFloat($(this).text()))];
           } else if($(this).attr('name')=='light') {
-            $(this).find("value").each(function() {
-              lightData.push(parseFloat($(this).text()));
-            });
-
+            latestLightData = [(parseFloat($(this).text()))];
           } else if($(this).attr('name')=='humidity') {
-            $(this).find("value").each(function() {
-              humidityData.push(parseFloat($(this).text()));
-            });
+            latestHumidityData = [(parseFloat($(this).text()))];
           }
 
         });
-  
-        if(tempData.length>0 && lightData.length>0 && humidityData.length>0) {
-          latestTempData = [(tempData[tempData.length-1])];
-          latestLightData = [(lightData[lightData.length-1])];
-          latestHumidityData = [(humidityData[humidityData.length-1])];  
-        }
         
+        console.log("light: "+latestLightData);
+        console.log("temperature: "+latestTempData);
+        console.log("humidity: "+latestHumidityData);
         
-        if(labels.length>5) {
-          labels.shift();
-          lightData.shift();
-          tempData.shift();
-          humidityData.shift();
-        }
-
-        console.log("light: "+lightData);
-        console.log("temperature: "+tempData);
-        console.log("humidity: "+humidityData);
-
         recall();  
         
       },
@@ -487,7 +446,7 @@ function getLatestData() {
 
 }
 
-
+//call getLatestData() after 5 seconds
 function recall() {
   setTimeout(function() {
     getLatestData();
