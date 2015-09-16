@@ -12,17 +12,407 @@ var tempData=[];
 var lightData=[];
 var humidityData=[];
 var labels = [];
+var latestTempData = [0];
+var latestLightData = [0];
+var latestHumidityData = [0];
 
 
 jQuery(document).ready(function($) {
 
     currentUrl = window.location.host;
-    
     $('#targetService').val(currentUrl);
+
+
     //load latest sensor data
     getLatestData();
 
+    setTimeout(function() {
+
+      $('#loading').remove();      
+      initializeTemp();
+      initializeLight();
+      initializeHumidity();
+    }, 1000);  
+
 });
+
+
+
+
+
+function initializeTemp() {
+
+    $('#tempContainer').highcharts({
+
+        chart: {
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+
+        title: {
+            text: 'Temperature'
+        },
+
+        pane: {
+            startAngle: -150,
+            endAngle: 150,
+            background: [{
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#FFF'],
+                        [1, '#333']
+                    ]
+                },
+                borderWidth: 0,
+                outerRadius: '109%'
+            }, {
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#333'],
+                        [1, '#FFF']
+                    ]
+                },
+                borderWidth: 1,
+                outerRadius: '107%'
+            }, {
+                // default background
+            }, {
+                backgroundColor: '#DDD',
+                borderWidth: 0,
+                outerRadius: '105%',
+                innerRadius: '103%'
+            }]
+        },
+
+        // the value axis
+        yAxis: {
+            min: -10,
+            max: 50,
+
+            minorTickInterval: 'auto',
+            minorTickWidth: 1,
+            minorTickLength: 10,
+            minorTickPosition: 'inside',
+            minorTickColor: '#666',
+
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            tickColor: '#666',
+            labels: {
+                step: 2,
+                rotation: 'auto'
+            },
+            title: {
+                text: 'Temperature'
+            },
+            plotBands: [{
+                from: -10,
+                to: 15,
+                color: '#1e90ff' // blue
+            }, {
+                from: 15,
+                to: 25,
+                color: '#228b22' // green
+            }, {
+                from: 25,
+                to: 30,
+                color: '#ffff00' // yellow
+            }, {
+                from: 30,
+                to: 50,
+                color: '#DF5353' // red
+            }]
+        },
+
+        series: [{
+            name: 'Temperature',
+            data: latestTempData,
+            tooltip: {
+                valueSuffix: ' °C'
+            }
+        }]
+
+    },
+        // Add some life
+        function (chart) {
+            if (!chart.renderer.forExport) {
+                setInterval(function () {
+                    var point = chart.series[0].points[0],
+                        newVal,
+                        inc = Math.round((Math.random() - 0.5) * 20);
+
+                    newVal = point.y + inc;
+                    if (newVal < 0 || newVal > 200) {
+                        newVal = point.y - inc;
+                    }
+
+                    point.update(latestTempData);
+
+                }, 3000);
+            }
+        });
+}
+
+
+function initializeLight() {
+
+    $('#lightContainer').highcharts({
+
+        chart: {
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+
+        title: {
+            text: 'Light'
+        },
+
+        pane: {
+            startAngle: -150,
+            endAngle: 150,
+            background: [{
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#FFF'],
+                        [1, '#333']
+                    ]
+                },
+                borderWidth: 0,
+                outerRadius: '109%'
+            }, {
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#333'],
+                        [1, '#FFF']
+                    ]
+                },
+                borderWidth: 1,
+                outerRadius: '107%'
+            }, {
+                // default background
+            }, {
+                backgroundColor: '#DDD',
+                borderWidth: 0,
+                outerRadius: '105%',
+                innerRadius: '103%'
+            }]
+        },
+
+        // the value axis
+        yAxis: {
+            min: 0,
+            max: 5,
+
+            minorTickInterval: 'auto',
+            minorTickWidth: 1,
+            minorTickLength: 10,
+            minorTickPosition: 'inside',
+            minorTickColor: '#666',
+
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            tickColor: '#666',
+            labels: {
+                step: 2,
+                rotation: 'auto'
+            },
+            title: {
+                text: 'Light'
+            },
+            plotBands: [{
+                from: 0,
+                to: 1,
+                color: '#000000' // black
+            }, {
+                from: 1,
+                to: 2,
+                color: '#bebebe' // grey
+            }, {
+                from: 2,
+                to: 4,
+                color: '#ffff00' // yellow
+            }, {
+                from: 4,
+                to: 5,
+                color: '#ffffff' // white
+            }]
+        },
+
+        series: [{
+            name: 'Light',
+            data: latestLightData,
+            tooltip: {
+                valueSuffix: ' Lumen'
+            }
+        }]
+
+    },
+        // Add some life
+        function (chart) {
+            if (!chart.renderer.forExport) {
+                setInterval(function () {
+                    var point = chart.series[0].points[0],
+                        newVal,
+                        inc = Math.round((Math.random() - 0.5) * 20);
+
+                    point.update(latestLightData);
+
+                }, 3000);
+            }
+        });
+}
+
+
+
+
+
+function initializeHumidity() {
+
+    $('#humidityContainer').highcharts({
+
+        chart: {
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+
+        title: {
+            text: 'Humidity'
+        },
+
+        pane: {
+            startAngle: -150,
+            endAngle: 150,
+            background: [{
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#FFF'],
+                        [1, '#333']
+                    ]
+                },
+                borderWidth: 0,
+                outerRadius: '109%'
+            }, {
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, '#333'],
+                        [1, '#FFF']
+                    ]
+                },
+                borderWidth: 1,
+                outerRadius: '107%'
+            }, {
+                // default background
+            }, {
+                backgroundColor: '#DDD',
+                borderWidth: 0,
+                outerRadius: '105%',
+                innerRadius: '103%'
+            }]
+        },
+
+        // the value axis
+        yAxis: {
+            min: 0,
+            max: 100,
+
+            minorTickInterval: 'auto',
+            minorTickWidth: 1,
+            minorTickLength: 10,
+            minorTickPosition: 'inside',
+            minorTickColor: '#666',
+
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            tickColor: '#666',
+            labels: {
+                step: 2,
+                rotation: 'auto'
+            },
+            title: {
+                text: 'Humidity'
+            },
+            plotBands: [{
+                from: 0,
+                to: 20,
+                color: '#DF5353' // blue
+            }, {
+                from: 20,
+                to: 40,
+                color: '#ffff00' // yellow
+            }, {
+                from: 40,
+                to: 60,
+                color: '#228b22' // green
+            }, {
+                from: 60,
+                to: 80,
+                color: '#ffff00' // yellow
+            }, {
+                from: 80,
+                to: 100,
+                color: '#DF5353' // red
+            }]
+        },
+
+        series: [{
+            name: 'Humidity',
+            data: latestHumidityData,
+            tooltip: {
+                valueSuffix: ' %'
+            }
+        }]
+
+    },
+        // Add some life
+        function (chart) {
+            if (!chart.renderer.forExport) {
+                setInterval(function () {
+                    var point = chart.series[0].points[0],
+                        newVal,
+                        inc = Math.round((Math.random() - 0.5) * 20);
+
+                    newVal = point.y + inc;
+                    if (newVal < 0 || newVal > 200) {
+                        newVal = point.y - inc;
+                    }
+
+                    point.update(latestHumidityData);
+
+                }, 3000);
+            }
+        });
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -37,7 +427,6 @@ function getLatestData() {
       success: function(data) {
         text="";
 
-        
         if($(data).find("InfoItem").length!=3) {
           console.error('dataset incomplete. Ignoring...');
           recall();
@@ -49,23 +438,30 @@ function getLatestData() {
 
           if($(this).attr('name')=='temperature') {
             $(this).find('value').each(function() {
-              tempData.push(parseFloat(Math.round($(this).text()).toFixed(1)));
+              tempData.push(parseFloat($(this).text()));
               labels.push(formatUnixTime($(this).attr('unixTime')));
 
             });
           } else if($(this).attr('name')=='light') {
             $(this).find("value").each(function() {
-              lightData.push(parseFloat(Math.round($(this).text()).toFixed(1)));
+              lightData.push(parseFloat($(this).text()));
             });
 
           } else if($(this).attr('name')=='humidity') {
             $(this).find("value").each(function() {
-              humidityData.push(parseFloat(Math.round($(this).text()).toFixed(1)));
+              humidityData.push(parseFloat($(this).text()));
             });
           }
 
         });
-
+  
+        if(tempData.length>0 && lightData.length>0 && humidityData.length>0) {
+          latestTempData = [(tempData[tempData.length-1])];
+          latestLightData = [(lightData[lightData.length-1])];
+          latestHumidityData = [(humidityData[humidityData.length-1])];  
+        }
+        
+        
         if(labels.length>5) {
           labels.shift();
           lightData.shift();
@@ -73,58 +469,9 @@ function getLatestData() {
           humidityData.shift();
         }
 
-        console.log(lightData);
-        console.log(tempData);
-        console.log(humidityData);
-
-
-
-        $('#container').highcharts({
-                title: {
-                    text: 'Monthly Average Temperature',
-                    x: -20 //center
-                },
-/*                
-                subtitle: {
-                    text: 'Source: WorldClimate.com',
-                    x: -20
-                },
-*/                
-                xAxis: {
-                    categories: labels
-                },
-                yAxis: {
-/*                  
-                    title: {
-                        text: 'Temperature (°C)'
-                    },
-*/                    
-                    plotLines: [{
-                        value: 0,
-                        width: 1,
-                        color: '#808080'
-                    }]
-                },
-                tooltip: {
-                    valueSuffix: '°C'
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'right',
-                    verticalAlign: 'middle',
-                    borderWidth: 0
-                },
-                series: [{
-                    name: 'Humidity',
-                    data: humidityData
-                }, {
-                    name: 'Temperature',
-                    data: tempData
-                }, {
-                    name: 'light',
-                    data: lightData
-                }]
-            });
+        console.log("light: "+lightData);
+        console.log("temperature: "+tempData);
+        console.log("humidity: "+humidityData);
 
         recall();  
         
@@ -148,6 +495,7 @@ function recall() {
 }
 
 
+
 function formatUnixTime(unix_timestamp) {
     // create a new javascript Date object based on the timestamp
   // multiplied by 1000 so that the argument is in milliseconds, not seconds
@@ -164,7 +512,4 @@ function formatUnixTime(unix_timestamp) {
 
   return formattedTime;
 }
-
-
-
 

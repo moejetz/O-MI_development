@@ -97,10 +97,19 @@
 	            <fieldset>
 	                <legend style="font-size:1.2em;">Current sensor data</legend>
 	            </fieldset>
-
-					<div class="data"></div>
-					<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-
+					
+				<div class="row marketing">
+					<div class="col-lg-4">
+						<div id="tempContainer" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+					</div>
+					<div class="col-lg-4">
+						<div id="loading" class="text-center text-bottom" style="margin-top:120px;">Loading data...</div>
+						<div id="lightContainer" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+					</div>
+					<div class="col-lg-4">
+						<div id="humidityContainer" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+					</div>
+				</div>
 	        </div>
 
         <!-- /.row -->
@@ -137,6 +146,7 @@
     </script>
 
     <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="js/omi.js"></script>
 
