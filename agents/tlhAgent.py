@@ -34,7 +34,7 @@ if(len(sys.argv)>1):
 		exit(0)
 
 	if(sys.argv[1]=='-v' or sys.argv[1]=='--verbose'):
-		startMessage = ('\r\n=================================\r\n[Starting agent in verbose mode]\r\n=================================')
+		startMessage = ('\r\n==================================\r\n[Starting agent in verbose mode]\r\n==================================')
 		verbose=True
 print (startMessage)
 
@@ -47,16 +47,22 @@ try:
     while True:
 
         #get current values
+        humidity    = io.open('/mnt/1wire/26.DD4DCB010000/humidity', 'r')   .read().strip()
         temperature = io.open('/mnt/1wire/26.595D45010000/temperature', 'r').read().strip()
-        light 		= io.open('/mnt/1wire/26.595D45010000/VAD', 'r')		.read().strip()
-        humidity 	= io.open('/mnt/1wire/26.DD4DCB010000/humidity', 'r')	.read().strip()
+        lightVoltage= float(io.open('/mnt/1wire/26.595D45010000/VAD', 'r')	.read().strip())
+        
+        lightLux    = 12779 * lightVoltage - 121.89
+        lightLux = round(lightLux, 2)
+        if(lightLux<0):
+            lightLux=0
+        lightLux=str(lightLux)
 
         #verbose output
         if(verbose):
             print ('Temperature:\t\t', temperature)
-            print ('Light:\t\t\t', light)
+            print ('Light:\t\t\t', lightLux)
             print ('Humidity:\t\t', humidity)
-            print ('=================================')
+            print ('==================================')
 
         odf_message = b'''
             <Objects xmlns="odf.xsd">
@@ -69,7 +75,7 @@ try:
                     </InfoItem>
                     <InfoItem name="light">
                         <value>''' +\
-                        	bytes(light, "utf-8") +\
+                        	bytes(lightLux, "utf-8") +\
                         b'''</value>
                     </InfoItem>
                     <InfoItem name="humidity">

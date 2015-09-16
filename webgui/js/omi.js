@@ -25,15 +25,33 @@ jQuery(document).ready(function($) {
     currentUrl = window.location.host;
     $('#targetService').val(currentUrl);
 
+    //hide gauges
+    $("#tempContainer").hide();
+    $("#lightContainer").hide();
+    $("#humidityContainer").hide();
+
 
     //load latest sensor data
     getLatestData();
 
+
     setTimeout(function() {   
-      initializeTemp();
-      initializeLight();
-      initializeHumidity();
-    }, 1);  
+        $("#loadingData").fadeOut(1000, function() {
+            
+            $("#loadingData").remove();    
+
+            //ititialize gauges
+            initializeTemp();
+            initializeLight();
+            initializeHumidity();
+
+            //show gauges
+            $("#tempContainer").fadeIn(2000);
+            $("#lightContainer").fadeIn(2000);
+            $("#humidityContainer").fadeIn(2000);
+        });
+
+    }, 1000);  
 
 });
 
@@ -42,6 +60,7 @@ jQuery(document).ready(function($) {
 
 
 function initializeTemp() {
+
 
     $('#tempContainer').highcharts({
 
@@ -52,12 +71,18 @@ function initializeTemp() {
             plotBorderWidth: 0,
             plotShadow: false
         },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
         title: {
-            text: 'Temperature'
+            text: 'Temperature [°C]'
         },
         pane: {
-            startAngle: -150,
-            endAngle: 150,
+            startAngle: -130,
+            endAngle: 130,
             background: [{
                 backgroundColor: {
                     linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -132,9 +157,7 @@ function initializeTemp() {
         series: [{
             name: 'Temperature',
             data: latestTempData,
-            tooltip: {
-                valueSuffix: ' °C'
-            }
+            enableMouseTracking: false
         }]
     },
     // Add some life
@@ -164,12 +187,18 @@ function initializeLight() {
             plotBorderWidth: 0,
             plotShadow: false
         },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
         title: {
-            text: 'Light'
+            text: 'Light [Lux]'
         },
         pane: {
-            startAngle: -150,
-            endAngle: 150,
+            startAngle: -130,
+            endAngle: 130,
             background: [{
                 backgroundColor: {
                     linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -203,7 +232,7 @@ function initializeLight() {
         // the value axis
         yAxis: {
             min: 0,
-            max: 5,
+            max: 60000,
 
             minorTickInterval: 'auto',
             minorTickWidth: 1,
@@ -225,19 +254,19 @@ function initializeLight() {
             },
             plotBands: [{
                 from: 0,
-                to: 1,
+                to: 15000,
                 color: '#000000' // black
             }, {
-                from: 1,
-                to: 2,
+                from: 15000,
+                to: 30000,
                 color: '#bebebe' // grey
             }, {
-                from: 2,
-                to: 4,
+                from: 30000,
+                to: 45000,
                 color: '#ffff00' // yellow
             }, {
-                from: 4,
-                to: 5,
+                from: 45000,
+                to: 60000,
                 color: '#ffffff' // white
             }]
         },
@@ -245,9 +274,7 @@ function initializeLight() {
         series: [{
             name: 'Light',
             data: latestLightData,
-            tooltip: {
-                valueSuffix: ' Lumen'
-            }
+            enableMouseTracking: false
         }]
 
     },
@@ -258,7 +285,6 @@ function initializeLight() {
                 var point = chart.series[0].points[0],
                     newVal,
                     inc = Math.round((Math.random() - 0.5) * 20);
-
                 point.update(latestLightData);
 
             }, 3000);
@@ -281,12 +307,18 @@ function initializeHumidity() {
             plotBorderWidth: 0,
             plotShadow: false
         },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
         title: {
-            text: 'Humidity'
+            text: 'Humidity [%]'
         },
         pane: {
-            startAngle: -150,
-            endAngle: 150,
+            startAngle: -130,
+            endAngle: 130,
             background: [{
                 backgroundColor: {
                     linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -366,9 +398,7 @@ function initializeHumidity() {
         series: [{
             name: 'Humidity',
             data: latestHumidityData,
-            tooltip: {
-                valueSuffix: ' %'
-            }
+            enableMouseTracking: false
         }]
 
     },
@@ -379,20 +409,12 @@ function initializeHumidity() {
                 var point = chart.series[0].points[0],
                     newVal,
                     inc = Math.round((Math.random() - 0.5) * 20);
-
                 point.update(latestHumidityData);
 
             }, 3000);
         }
     });
 }
-
-
-
-
-
-
-
 
 
 
@@ -431,7 +453,8 @@ function getLatestData() {
         console.log("light: "+latestLightData);
         console.log("temperature: "+latestTempData);
         console.log("humidity: "+latestHumidityData);
-        
+        console.log("========================");
+
         recall();  
         
       },
@@ -441,10 +464,10 @@ function getLatestData() {
       }
     });
 
-
- 
-
 }
+
+
+
 
 //call getLatestData() after 5 seconds
 function recall() {
