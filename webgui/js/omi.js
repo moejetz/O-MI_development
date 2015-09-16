@@ -49,18 +49,18 @@ function getLatestData() {
 
           if($(this).attr('name')=='temperature') {
             $(this).find('value').each(function() {
-              tempData.push(Math.round($(this).text()).toFixed(1));
-              labels.push($(this).attr('unixTime'));
+              tempData.push(parseFloat(Math.round($(this).text()).toFixed(1)));
+              labels.push(formatUnixTime($(this).attr('unixTime')));
 
             });
           } else if($(this).attr('name')=='light') {
             $(this).find("value").each(function() {
-              lightData.push(Math.round($(this).text()).toFixed(1));
+              lightData.push(parseFloat(Math.round($(this).text()).toFixed(1)));
             });
 
           } else if($(this).attr('name')=='humidity') {
             $(this).find("value").each(function() {
-              humidityData.push(Math.round($(this).text()).toFixed(1));
+              humidityData.push(parseFloat(Math.round($(this).text()).toFixed(1)));
             });
           }
 
@@ -73,18 +73,61 @@ function getLatestData() {
           humidityData.shift();
         }
 
-        var options = {
-            //width: 300,
-            height: 300
-        };
+        console.log(lightData);
+        console.log(tempData);
+        console.log(humidityData);
 
-        new Chartist.Line('.ct-chart', {
-            labels: labels,
-            series: [tempData, lightData, humidityData]
-          } ,options
-        );
+
+
+        $('#container').highcharts({
+                title: {
+                    text: 'Monthly Average Temperature',
+                    x: -20 //center
+                },
+/*                
+                subtitle: {
+                    text: 'Source: WorldClimate.com',
+                    x: -20
+                },
+*/                
+                xAxis: {
+                    categories: labels
+                },
+                yAxis: {
+/*                  
+                    title: {
+                        text: 'Temperature (°C)'
+                    },
+*/                    
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    valueSuffix: '°C'
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    borderWidth: 0
+                },
+                series: [{
+                    name: 'Humidity',
+                    data: humidityData
+                }, {
+                    name: 'Temperature',
+                    data: tempData
+                }, {
+                    name: 'light',
+                    data: lightData
+                }]
+            });
+
         recall();  
-
+        
       },
       error: function(data) {
         console.log(data);
@@ -104,6 +147,23 @@ function recall() {
   }, 5000);  
 }
 
+
+function formatUnixTime(unix_timestamp) {
+    // create a new javascript Date object based on the timestamp
+  // multiplied by 1000 so that the argument is in milliseconds, not seconds
+  var date = new Date(unix_timestamp*1000);
+  // hours part from the timestamp
+  var hours = date.getHours();
+  // minutes part from the timestamp
+  var minutes = "0" + date.getMinutes();
+  // seconds part from the timestamp
+  var seconds = "0" + date.getSeconds();
+
+  // will display time in 10:30:23 format
+  var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+  return formattedTime;
+}
 
 
 
