@@ -21,7 +21,7 @@ import io
 import sys
 
 #connection data
-omi_node_ip = "130.233.193.113"
+omi_node_ip = "130.233.193.135"
 omi_node_external_agent_port = 8181
 sleepTime = 5
 
