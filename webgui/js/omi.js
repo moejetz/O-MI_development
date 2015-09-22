@@ -1,6 +1,6 @@
-url = "http://130.233.193.113:8080/";
+url = "http://130.233.193.135:8080/";
 dataType = "application/xml";
-xml = 
+xmlGetData =
   '<?xml version="1.0"?>'+
   '<omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="0">'+
     '<omi:read msgformat="odf">'+
@@ -12,13 +12,34 @@ xml =
         '</Objects>'+
       '</msg>'+
     '</omi:read>'+
-  '</omi:omiEnvelope>'
+  '</omi:omiEnvelope>';
+
+
+xmlPostData1 =
+  '<?xml version="1.0"?>'+
+    '<omi:omiEnvelope xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xmlns:omi="omi.xsd" version="1.0" ttl="0">'+
+      '<write xmlns="omi.xsd" msgformat="odf">'+
+        '<omi:msg>'+
+          '<Objects xmlns="odf.xsd">'+
+            '<Object>'+
+              '<id>CS Building - B126</id>'+
+              '<InfoItem name="Plug2">'+
+                '<value>';
+xmlPostData2 =
+                '</value>'+
+              '</InfoItem>'+
+            '</Object>'+
+          '</Objects>'+
+        '</omi:msg>'+
+      '</write>'+
+    '</omi:omiEnvelope>';
+
 
 
 var latestTempData = [0];
 var latestLightData = [0];
 var latestHumidityData = [0];
-
+var latestPlugState = '0';
 
 jQuery(document).ready(function($) {
 
@@ -26,19 +47,25 @@ jQuery(document).ready(function($) {
     $('#targetService').val(currentUrl);
 
     //hide gauges
+    $("#switchContainer").hide();
     $("#tempContainer").hide();
     $("#lightContainer").hide();
     $("#humidityContainer").hide();
 
 
+
+    $("#switchBtn").click(function() {
+      switchPlug($("#switchBtn").val());
+    });
+
     //load latest sensor data
     getLatestData();
 
 
-    setTimeout(function() {   
+    setTimeout(function() {
         $("#loadingData").fadeOut(1000, function() {
-            
-            $("#loadingData").remove();    
+
+            $("#loadingData").remove();
 
             //ititialize gauges
             initializeTemp();
@@ -49,9 +76,10 @@ jQuery(document).ready(function($) {
             $("#tempContainer").fadeIn(2000);
             $("#lightContainer").fadeIn(2000);
             $("#humidityContainer").fadeIn(2000);
+            $("#switchContainer").fadeIn(1500);
         });
 
-    }, 1000);  
+    }, 1000);
 
 });
 
@@ -422,21 +450,15 @@ function initializeHumidity() {
 
 
 function getLatestData() {
-      
+
       $.ajax({
       type: "POST",
       url: url,
       contentType: "text/xml",
       dataType: "xml",
-      data: xml,
+      data: xmlGetData,
       success: function(data) {
         text="";
-
-        if($(data).find("InfoItem").length!=3) {
-          console.error('dataset incomplete. Ignoring...');
-          recall();
-          return;
-        }
 
         $(data).find("InfoItem").each(function() {
 
@@ -446,17 +468,36 @@ function getLatestData() {
             latestLightData = [(parseFloat($(this).text()))];
           } else if($(this).attr('name')=='humidity') {
             latestHumidityData = [(parseFloat($(this).text()))];
+          } else if($(this).attr('name')=='Plug2') {
+            latestPlugState = $(this).text();
           }
 
         });
-        
+
         console.log("light: "+latestLightData);
         console.log("temperature: "+latestTempData);
         console.log("humidity: "+latestHumidityData);
+        console.log("plugState: "+latestPlugState);
         console.log("========================");
 
-        recall();  
-        
+        //update plug ui
+        if(latestPlugState=='0') {
+            $('#switchBtn').html('Turn ON');
+            $("#switchBtn").val("1");
+            $('#currentPlugState').css('background-color', 'red');
+            $('#currentPlugState').html('Current state: OFF');
+
+        } else {
+            $('#switchBtn').html('Turn OFF');
+            $("#switchBtn").val("0");
+            $('#currentPlugState').css('background-color', 'green');
+            $('#currentPlugState').html('Current state: ON');
+        }
+
+        $('#switchBtn').removeClass('disabled');
+
+        recall();
+
       },
       error: function(data) {
         console.log(data);
@@ -468,12 +509,35 @@ function getLatestData() {
 
 
 
+function switchPlug (newVal) {
+
+    console.error("NEW SWITCH VALUE: "+newVal);
+
+    $.ajax({
+      type: "POST",
+      url: url,
+      contentType: "text/xml",
+      dataType: "xml",
+      data: xmlPostData1+newVal+xmlPostData2,
+      success: function(data) {
+
+        console.log("SUCCESS!");
+        $('#currentPlugState').html('');
+        $('#switchBtn').html('loading...');
+        $('#switchBtn').addClass('disabled');
+
+      }
+
+    });
+
+}
+
 
 //call getLatestData() after 5 seconds
 function recall() {
   setTimeout(function() {
     getLatestData();
-  }, 5000);  
+  }, 5000);
 }
 
 
