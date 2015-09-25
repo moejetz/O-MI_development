@@ -1,65 +1,67 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-"""
-Save this file as server.py
->>> python server.py 0.0.0.0 8001
-serving on 0.0.0.0:8001
+from bottle import route, run, template, request
+import bottle.ext.sqlite
 
-or simply
-
->>> python server.py
-Serving on localhost:8000
-
-You can use this to test GET and POST methods.
-
-"""
-
-import SimpleHTTPServer
-import SocketServer
-import logging
-import cgi
-
-import sys
+#register sqlite plugin
+app = bottle.Bottle()
+plugin = bottle.ext.sqlite.Plugin(dbfile='database.db')
+app.install(plugin)
 
 
-if len(sys.argv) > 2:
-    PORT = int(sys.argv[2])
-    I = sys.argv[1]
-elif len(sys.argv) > 1:
-    PORT = int(sys.argv[1])
-    I = ""
-else:
-    PORT = 8000
-    I = ""
+################ routes ################
 
 
-class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+@app.route('/setup')
+def setup(db):
 
-    def do_GET(self):
-        logging.warning("======= GET STARTED =======")
-        logging.warning(self.headers)
-        SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+    try:
 
-    def do_POST(self):
-        logging.warning("======= POST STARTED =======")
-        logging.warning(self.headers)
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD':'POST',
-                     'CONTENT_TYPE':self.headers['Content-Type'],
-                     })
-        logging.warning("======= POST VALUES =======")
-        for item in form.list:
-            logging.warning(item)
-        logging.warning("\n")
-        SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+        #delete old table
+        db.execute('PRAGMA writable_schema = 1;').fetchone()
+        db.execute('DELETE FROM sqlite_master WHERE type = "table";').fetchone()
+        db.execute('PRAGMA writable_schema = 0;').fetchone()
+        db.execute('VACUUM;').fetchone()
+        db.execute('PRAGMA INTEGRITY_CHECK;').fetchone()
 
-Handler = ServerHandler
+        #create new table
+        db.execute('CREATE TABLE plugs(mac varchar(255) PRIMARY KEY, ip varchar(255))').fetchone()
 
-httpd = SocketServer.TCPServer(("", PORT), Handler)
+        return str(True)
 
-print "@rochacbruno Python http server version 0.1 (for testing purposes only)"
-print "Serving at: http://%(interface)s:%(port)s" % dict(interface=I or "localhost", port=PORT)
-httpd.serve_forever()
+    except Exception as e:
+        print (e)
+        return str(False)
 
+
+
+
+
+
+@app.route('/plugs/<mac>')
+def getPlugIp(mac, db):
+    row = db.execute('SELECT * from plugs where mac=?', (mac,)).fetchone()
+    return row[1]
+
+
+
+@app.route('/plugs', method='POST')
+def insertOrUpdatePlug(db):
+
+    try:
+        mac = request.forms.get('mac')
+        ip = request.forms.get('ip')
+
+        db.execute('INSERT OR REPLACE INTO plugs VALUES (?,?)', (mac, ip)).fetchone()
+        return str(True)
+
+    except Exception as e:
+        print (e)
+        return str(False)
+
+
+
+
+
+
+app.run(host='0.0.0.0', port=9999, debug=True)
