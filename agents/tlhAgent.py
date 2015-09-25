@@ -50,7 +50,7 @@ try:
         humidity    = io.open('/mnt/1wire/26.DD4DCB010000/humidity', 'r')   .read().strip()
         temperature = io.open('/mnt/1wire/26.595D45010000/temperature', 'r').read().strip()
         lightVoltage= float(io.open('/mnt/1wire/26.595D45010000/VAD', 'r')	.read().strip())
-        
+
         lightLux    = 12779 * lightVoltage - 121.89
         lightLux = round(lightLux, 2)
         if(lightLux<0):
@@ -67,22 +67,25 @@ try:
         odf_message = b'''
             <Objects xmlns="odf.xsd">
                 <Object>
-                    <id>CS Building - B126</id>
-                    <InfoItem name="temperature">
-                        <value>''' +\
-                        	bytes(temperature, "utf-8") +\
-                        b'''</value>
-                    </InfoItem>
-                    <InfoItem name="light">
-                        <value>''' +\
-                        	bytes(lightLux, "utf-8") +\
-                        b'''</value>
-                    </InfoItem>
-                    <InfoItem name="humidity">
-                        <value>''' +\
-                            bytes(humidity, "utf-8") +\
-                        b'''</value>
-                    </InfoItem>
+                    <id>CS Building</id>
+                    <Object>
+                        <id>Room B126</id>
+                        <InfoItem name="temperature">
+                            <value>''' +\
+                            	bytes(temperature, "utf-8") +\
+                            b'''</value>
+                        </InfoItem>
+                        <InfoItem name="light">
+                            <value>''' +\
+                            	bytes(lightLux, "utf-8") +\
+                            b'''</value>
+                        </InfoItem>
+                        <InfoItem name="humidity">
+                            <value>''' +\
+                                bytes(humidity, "utf-8") +\
+                            b'''</value>
+                        </InfoItem>
+                    </Object>
                 </Object>
             </Objects>'''
 
