@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>O-MI GUI</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/modern-business.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-default navbar-static-top navbar-inverse" style="margin-bottom:0;">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+          data-target="#navbar-collapse" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">O-MI GUI</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="navbar-collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li>
+            <p id="versionNumber" class="navbar-text">
+              <b>v0.1</b> <small> -- 2015-09-14</small>
+            </p>
+          </li>
+          <li>
+            <form class="navbar-form navbar-left" role="search" style="width: 400px">
+              <a data-toggle="tooltip" title="Enter O-MI node url. Can be used to test any O-MI Node that has CORS support." data-placement="bottom">
+                <div class="input-group input-group-sm" style="width:100%;">
+                  <div class="input-group-addon">Server</div>
+                  <input id="targetService" type="text" class="form-control" placeholder="Enter O-MI node url" />
+                  <div class="input-group-addon">URL</div>
+                </div>
+              </a>
+            </form>
+          </li>
+          <!-- <li><a class="navbar-brand">WebClient</a></li> -->
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Documentation<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li> <a target="_blank" href="../ImplementationDetails.html">Example requests and results</a> </li>
+              <li> <a target="_blank" href="https://docs.google.com/document/d/10tdIBaZzR_ebyfrP0sdZoLEF5Ze6kt2HkW2xo9eQnfY/edit?usp=sharing">Implementation Details</a> </li>
+              <li> <a target="_blank" href="https://docs.google.com/document/d/1qEmM89UzOnpbk1Kk1xIi_bDT_05XbyadPAIo9dvAKW0/edit?usp=sharing">Architecture</a> </li>
+              <li> <a target="_blank" href="https://www2.opengroup.org/ogsys/catalog/C14B">Open Messaging Inerface standard</a> </li>
+              <li> <a target="_blank" href="https://www2.opengroup.org/ogsys/catalog/C14A">Open Data Format standard</a> </li>
+            </ul>
+          </li>
+          <li>
+            <a class="navbar-brand" href="#" style="display:none;">Subscriptions
+              <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+            </a>
+          </li>
+        </ul>
+
+      </div><!-- /.navbar-collapse -->
+    </div> <!-- /.container-fluid -->
+  </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+		<div class="row marketing" style="margin-top: 70px !important;">
+			<div class="col-lg-12" id="mainDiv" style="height:345px;">
+
+        <fieldset>
+            <legend style="font-size:1.2em;">Room B126</legend>
+
+
+  					<div class="col-lg-4">
+  						<div id="tempContainer" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+  					</div>
+  					<div class="col-lg-4">
+              <div id="loadingData" class="text-center" style="margin-top:120px;">Loading data...</div>
+  						<div id="lightContainer" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+  					</div>
+  					<div class="col-lg-4">
+  						<div id="humidityContainer" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+  					</div>
+
+            <div class="col-lg-12">
+              <div id="switchContainer" style="visible: hidden;">
+                <h4>Plug 2</h4>
+                <span id="currentPlugState">Current state: off</span>
+                <a id="switchBtn" class="btn btn-default" value="1">ToggleSwitch</a>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+
+		<!-- /.row -->
+		</div>
+        <br/><br/><br/>
+
+        <!-- Footer -->
+        <footer>
+            <hr>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p class="pull-left"><a href="/contakt.html">Contact</a> <b> &#183; </b><a href="/impressum.html">Impressum</a></p>
+                    <p class="pull-right">Adaptive Systems of Intelligent Agents (ASIA) Research Group, 2015</p><br/>
+                </div>
+            </div>
+        </footer>
+
+
+    </div>
+    <!-- /.container -->
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="js/omi.js"></script>
+
+</body>
+
+</html>
