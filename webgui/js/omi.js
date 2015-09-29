@@ -1,4 +1,4 @@
-url = "http://130.233.193.135:8080/";
+url = "http://130.233.193.79:8080/";
 dataType = "application/xml";
 xmlGetData =
   '<?xml version="1.0"?>'+
@@ -7,13 +7,15 @@ xmlGetData =
       '<msg xmlns="omi.xsd">'+
         '<Objects xmlns="odf.xsd">'+
           '<Object>'+
-            '<id>CS Building - B126</id>'+
+            '<id>CS Building</id>'+
+            '<Object>'+
+              '<id>Room B126</id>'+
+            '</Object>'+
           '</Object>'+
         '</Objects>'+
       '</msg>'+
     '</omi:read>'+
   '</omi:omiEnvelope>';
-
 
 xmlPostData1 =
   '<?xml version="1.0"?>'+
@@ -22,12 +24,14 @@ xmlPostData1 =
         '<omi:msg>'+
           '<Objects xmlns="odf.xsd">'+
             '<Object>'+
-              '<id>CS Building - B126</id>'+
-              '<InfoItem name="Plug2">'+
-                '<value>';
+              '<id>CS Building</id>'+
+              '<Object>'+
+                '<id>Room B126</id>'+
+                '<Object>'+
+                  '<id>Plugs</id>';
 xmlPostData2 =
-                '</value>'+
-              '</InfoItem>'+
+                '</Object>'+
+              '</Object>'+
             '</Object>'+
           '</Objects>'+
         '</omi:msg>'+
@@ -39,7 +43,6 @@ xmlPostData2 =
 var latestTempData = [0];
 var latestLightData = [0];
 var latestHumidityData = [0];
-var latestPlugState = '0';
 
 jQuery(document).ready(function($) {
 
@@ -51,12 +54,7 @@ jQuery(document).ready(function($) {
     $("#tempContainer").hide();
     $("#lightContainer").hide();
     $("#humidityContainer").hide();
-
-
-
-    $("#switchBtn").click(function() {
-      switchPlug($("#switchBtn").val());
-    });
+    $("#plugsTable").hide();
 
     //load latest sensor data
     getLatestData();
@@ -77,6 +75,7 @@ jQuery(document).ready(function($) {
             $("#lightContainer").fadeIn(2000);
             $("#humidityContainer").fadeIn(2000);
             $("#switchContainer").fadeIn(1500);
+            $("#plugsTable").fadeIn(1500);
         });
 
     }, 1000);
@@ -460,16 +459,14 @@ function getLatestData() {
       success: function(data) {
         text="";
 
+        //process sensor data
         $(data).find("InfoItem").each(function() {
-
           if($(this).attr('name')=='temperature') {
             latestTempData = [(parseFloat($(this).text()))];
           } else if($(this).attr('name')=='light') {
             latestLightData = [(parseFloat($(this).text()))];
           } else if($(this).attr('name')=='humidity') {
             latestHumidityData = [(parseFloat($(this).text()))];
-          } else if($(this).attr('name')=='Plug2') {
-            latestPlugState = $(this).text();
           }
 
         });
@@ -477,24 +474,40 @@ function getLatestData() {
         console.log("light: "+latestLightData);
         console.log("temperature: "+latestTempData);
         console.log("humidity: "+latestHumidityData);
-        console.log("plugState: "+latestPlugState);
+
+        //process plugs
+
+        $('#plugsTable').html('<tr><th>Name</th><th>State</th><th>Toggle</th></tr>');
+        $(data).find("Object id").filter(function() { return $(this).text() == "Plugs"; }).parent().find("Object").each(function() {
+            name = $(this).find("id").text();
+            mac = $(this).find("InfoItem").attr('name');
+            value = $(this).find("InfoItem").find("value").text();
+            console.log(name+' MAC: '+mac+', VALUE: '+value);
+
+            plugRow = '<tr>';
+            plugRow += '<td>'+name+'</td>';
+
+
+            if(parseInt(value)<=0) {
+                plugFunctionHtml = "switchPlug('"+name+"', '"+mac+"', '1');return false;";
+                plugRow+='<td><span class="currentPlugState" style="background-color:red;">Off</span></td>';
+                plugRow+='<td><a class="btn btn-default" href="#" onclick="'+plugFunctionHtml+'">Turn ON</a></td>'
+
+            } else {
+                plugFunctionHtml = "switchPlug('"+name+"', '"+mac+"', '0');return false;";
+                plugRow+='<td><span class="currentPlugState" style="background-color:green;">On</span></td>';
+                plugRow+='<td><a class="btn btn-default" href="#" onclick="'+plugFunctionHtml+'">Turn OFF</a></td>'
+            }
+
+            plugRow+="</tr>"
+
+            $('#plugsTable').append(plugRow);
+
+        });
+
+
+
         console.log("========================");
-
-        //update plug ui
-        if(latestPlugState=='0') {
-            $('#switchBtn').html('Turn ON');
-            $("#switchBtn").val("1");
-            $('#currentPlugState').css('background-color', 'red');
-            $('#currentPlugState').html('Current state: OFF');
-
-        } else {
-            $('#switchBtn').html('Turn OFF');
-            $("#switchBtn").val("0");
-            $('#currentPlugState').css('background-color', 'green');
-            $('#currentPlugState').html('Current state: ON');
-        }
-
-        $('#switchBtn').removeClass('disabled');
 
         recall();
 
@@ -509,23 +522,30 @@ function getLatestData() {
 
 
 
-function switchPlug (newVal) {
+function switchPlug (name, mac, value) {
 
-    console.error("NEW SWITCH VALUE: "+newVal);
+    console.error("Switching state of "+name+" to "+value);
+
+    plugData =
+        '<Object>'+
+          '<id>'+name+'</id>'+
+          '<InfoItem name="'+mac+'">'+
+            '<value>'+value+'</value>'+
+          '</InfoItem>'+
+        '</Object>';
 
     $.ajax({
       type: "POST",
       url: url,
       contentType: "text/xml",
       dataType: "xml",
-      data: xmlPostData1+newVal+xmlPostData2,
+      data: xmlPostData1+plugData+xmlPostData2,
       success: function(data) {
 
-        console.log("SUCCESS!");
-        $('#currentPlugState').html('');
-        $('#switchBtn').html('loading...');
-        $('#switchBtn').addClass('disabled');
+        //console.log(data);
 
+      }, error: function(data) {
+        console.error(data);
       }
 
     });
