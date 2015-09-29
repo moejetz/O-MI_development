@@ -30,9 +30,11 @@ def seperator():
 
 
 #sends HTTP request to toggle a network outlet
-def togglePlug(value):
-    print ("Toggle plug...")
-    r = requests.get('http://aalto:aalto@130.233.193.114/xml/jsonswitch.php?id=1&set='+value)
+def togglePlug(mac, value):
+
+    ip = str(requests.get('http://130.233.193.68:8282/plugs/'+mac).text)
+    print ("Toggle plug "+ip)
+    r = requests.get('http://aalto:aalto@'+ip+'/xml/jsonswitch.php?id=1&set='+value)
 
 
 
@@ -51,11 +53,12 @@ class CallbackHandler(BaseHTTPRequestHandler):
         #XML parsing stuff
         parsedMsg = minidom.parseString(msg)
         for infoItem in parsedMsg.getElementsByTagName('InfoItem'):
-            name = infoItem.attributes['name'].value
+            mac = infoItem.attributes['name'].value
             value = infoItem.getElementsByTagName("value")[0].firstChild.data
 
-            if(name[:4]=="Plug"):
-                togglePlug(value)
+
+            #if(name[:4]=="Plug"):
+            togglePlug(mac, value)
 
 
 
