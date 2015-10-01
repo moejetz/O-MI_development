@@ -18,7 +18,7 @@ while true; do
     ip="$tmp_ip"
 
     data="mac=$mac&ip=$ip"
-    curl --data "$data" http://130.233.193.68:8282/plugs
+    curl --data "$data" http://otaniemi3d.cs.hut.fi:8282/plugs
 
   fi;
 

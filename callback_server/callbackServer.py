@@ -32,7 +32,7 @@ def seperator():
 #sends HTTP request to toggle a network outlet
 def togglePlug(mac, value):
 
-    ip = str(requests.get('http://130.233.193.68:8282/plugs/'+mac).text)
+    ip = str(requests.get('http://otaniemi3d.cs.hut.fi:8282/plugs/'+mac).text)
     print ("Toggle plug "+ip)
     r = requests.get('http://aalto:aalto@'+ip+'/xml/jsonswitch.php?id=1&set='+value)
 
@@ -56,10 +56,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
             mac = infoItem.attributes['name'].value
             value = infoItem.getElementsByTagName("value")[0].firstChild.data
 
-
-            #if(name[:4]=="Plug"):
             togglePlug(mac, value)
-
 
 
         # Print response to terminal
@@ -74,6 +71,6 @@ class CallbackHandler(BaseHTTPRequestHandler):
 
 
 
-server_address = ('', 5432)
+server_address = ('', 8284)
 httpd = HTTPServer(server_address, CallbackHandler)
 httpd.serve_forever()

@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 '''
@@ -21,7 +21,7 @@ import io
 import sys
 
 #connection data
-omi_node_ip = "130.233.193.79"
+omi_node_ip = "otaniemi3d.cs.hut.fi"
 omi_node_external_agent_port = 8181
 sleepTime = 5
 
