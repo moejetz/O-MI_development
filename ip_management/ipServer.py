@@ -20,11 +20,17 @@ Written by Moritz Kraus, 2015
 
 from bottle import route, run, template, request
 import bottle.ext.sqlite
+import os
+
+#get current path
+current_path=os.path.dirname(os.path.abspath(__file__))+'/'
+
 
 #register sqlite plugin
 app = bottle.Bottle()
-plugin = bottle.ext.sqlite.Plugin(dbfile='database.db')
+plugin = bottle.ext.sqlite.Plugin(dbfile=current_path+'database.db')
 app.install(plugin)
+
 
 
 ################ routes ################
