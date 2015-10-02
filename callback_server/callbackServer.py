@@ -20,9 +20,13 @@ from http.server import *
 from xml.dom import minidom
 import requests
 
+#server data
+address = '0.0.0.0'
+port = 8284
 
 # Count responses for convenience
 responseNum = 1
+
 
 # Prints seperation lines on the terminal
 def seperator():
@@ -71,6 +75,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
 
 
 
-server_address = ('', 8284)
-httpd = HTTPServer(server_address, CallbackHandler)
+httpd = HTTPServer((address, port), CallbackHandler)
+print ('Listening on http://'+address+':'+str(port)+'/')
 httpd.serve_forever()
+
