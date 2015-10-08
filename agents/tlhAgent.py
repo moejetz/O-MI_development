@@ -50,7 +50,7 @@ def run():
             temperature = io.open('/mnt/1wire/26.595D45010000/temperature', 'r').read().strip()
             lightVoltage= float(io.open('/mnt/1wire/26.595D45010000/VAD', 'r')  .read().strip())
 
-            lightLux    = 12779 * lightVoltage - 121.89
+            lightLux = (12779 * lightVoltage - 121.89)/100
             lightLux = round(lightLux, 2)
             if(lightLux<0):
                 lightLux=0
@@ -59,9 +59,9 @@ def run():
             odf_message = b'''
                 <Objects xmlns="odf.xsd">
                     <Object>
-                        <id>CS Building</id>
+                        <id>K1</id>
                         <Object>
-                            <id>Room B126</id>
+                            <id>Room-147a</id>
                             <InfoItem name="temperature">
                                 <value>''' +\
                                     bytes(temperature, "utf-8") +\
